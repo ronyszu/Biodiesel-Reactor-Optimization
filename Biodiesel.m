@@ -8,39 +8,42 @@ clc
 global  Vpfr Vpfrboth VetorDefinidor Ordem
 
 
-%Resolução p/ 1 CSTR - CONFIGURACAO 1
-VetorDefinidor = [0 0 1 0];
-[K, S] = fminsearch(@Otimizador_Central_BD, [8 1]);
-C1VCSTR =K(2)^2;  %Volume do CSTR
-C1A = K(1)^2;  %Vazão de entrada de Metanol
-C1Obj = -S;  %Valor da função objetivo
+% %Resolução p/ 1 CSTR - CONFIGURACAO 1
+% VetorDefinidor = [0 0 1 0];
+% Ordem = 1;
+% [K, S] = fminsearch(@Otimizador_Central_BD, [8 1]);
+% C1VCSTR =K(2)^2;  %Volume do CSTR
+% C1A = K(1)^2;  %Vazão de entrada de Metanol
+% C1Obj = -S;  %Valor da função objetivo
+% 
+% 
+% %Resolução p/ 1 PFR - CONFIGURACAO 2
+% VetorDefinidor = [0 0 0 1];
+% Ordem = -1;
+% [F, S] = fminsearch(@Otimizador_Central_BD, 50);
+% C2VPFR= Vpfr;  %Volume do PFR 
+% C2A = F;  %Vazão de entrada de Metanol
+% C2Obj = -S;  %Valor da função objetivo
+% 
+% 
+% %Resolução p/  CSTR - CSTR - CONFIGURACAO 3
+% VetorDefinidor = [0 0 2 0];
+% Ordem = [1 1];
+% [K, S] = fminsearch(@Otimizador_Central_BD, [8 1 1]);
+% V2CSTR(1) = K(2)^2;  %Volume do 1o CSTR
+% V2CSTR(2) = K(3)^2;  %Volume do 2o CSTR
+% FA02CSTR = K(1)^2;  %Vazão de entrada de Metanol
+% Obj2CSTR = -S;  %Valor da função objetivo
 
 
-%Resolução p/ 1 PFR - CONFIGURACAO 2
-VetorDefinidor = [0 0 0 1];
-[F, S] = fminsearch(@Otimizador_Central_BD, 50);
-C2VPFR= Vpfr;  %Volume do PFR 
-C2A = F;  %Vazão de entrada de Metanol
-C2Obj = -S;  %Valor da função objetivo
-
-
-%Resolução p/  CSTR - CSTR - CONFIGURACAO 3
-VetorDefinidor = [0 0 2 0];
-[K, S] = fminsearch(@Otimizador_Central_BD, [8 1 1]);
-V2CSTR(1) = K(2)^2;  %Volume do 1o CSTR
-V2CSTR(2) = K(3)^2;  %Volume do 2o CSTR
-FA02CSTR = K(1)^2;  %Vazão de entrada de Metanol
-Obj2CSTR = -S;  %Valor da função objetivo
-
-
-%Resolução p/ CSTR - PFR  - CONFIGURACAO 4
-VetorDefinidor = [0 0 1 1]; %vai funcionar por enquanto, pois na rotina do otimizador, CSTR está antes do PFR, mas e depois para fazer ao contrário?
-Ordem = [1 -1]; %define ordem, onde -1 é PFR, 1 é CSR , e misturador e separador?
-[K, S] = fminsearch(@Otimizador_Central_BD, [8 1]);
-VBothCSTR = K(2)^2;  %Volume do CSTR
-VBothPFR = Vpfrboth;  %Volume do PFR
-FA0Both = K(1)^2;  %Vazão de entrada de Metanol
-ObjBoth = -S;  %Valor da função objetivo
+% %Resolução p/ CSTR - PFR  - CONFIGURACAO 4
+% VetorDefinidor = [0 0 1 1]; %vai funcionar por enquanto, pois na rotina do otimizador, CSTR está antes do PFR, mas e depois para fazer ao contrário?
+% Ordem = [1 -1]; %define ordem, onde -1 é PFR, 1 é CSR , e misturador e separador?
+% [K, S] = fminsearch(@Otimizador_Central_BD, [8 1]);
+% VBothCSTR = K(2)^2;  %Volume do CSTR
+% VBothPFR = Vpfrboth;  %Volume do PFR
+% FA0Both = K(1)^2;  %Vazão de entrada de Metanol
+% ObjBoth = -S;  %Valor da função objetivo
 
 
 %Resolução p/ PFR - CSTR  - CONFIGURACAO 5

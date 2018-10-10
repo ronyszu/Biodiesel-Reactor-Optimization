@@ -29,7 +29,7 @@ for ordem = Ordem
                 %composicoes da mistura inicial
                 Xbd= FBD0/F;
                 Xa= FA0/F;
-                Xtg= FTG0/F;
+                Xtg= FTG0/F;    
                 Xdg= FDG0/F;
                 Xmg= FMG0/F;
                 Xgli= FGL0/F;
@@ -155,8 +155,11 @@ for ordem = Ordem
         case -1
             
             if VetorDefinidor(4)
-                FA0=K(1)^2;
                 
+                if Ordem(1)==-1 % se só tiver PFR
+                    FA0=K(1);  %se botar ao quadrado nao converge o PFR sozinho
+                    
+                end
                 
                 %Vazão volumétrica total (L/min)
                 Q =FA0*32/791.8 + FTG0*872.6/925;
@@ -170,7 +173,7 @@ for ordem = Ordem
                 
                 
                 
-                if VetorDefinidor(3)==1
+                if Ordem(1)==1
                     FBD0=FBD;
                     FA0=FA;
                     FTG0=FTG;
@@ -193,7 +196,7 @@ for ordem = Ordem
                 % do reator CSTR operando em batelada
                 Vmaxpfr = Vmax/4;
                 
-                if VetorDefinidor(3)
+                if Ordem(1)==1
                     %Redefinindo o VmaxPFR a partir do volume já encontrado para o CSTR
                     Vmaxpfr = Vmaxpfr - V(1)/4;
                     %Redefine caso ultrapasse o limite inferior estipulado (0.1)
@@ -223,6 +226,7 @@ for ordem = Ordem
             end
             
     end
+    end
     %---------------------------------------------------------Funcao Objetivo Final
     
     %%Outras funções objetivo possíveis (conversão, seletividade, média...)
@@ -235,6 +239,9 @@ for ordem = Ordem
     
     %--------------------------------------Obj BOTH
     if (VetorDefinidor(3) && VetorDefinidor(4))
+        
+        if Ordem(1)==1 %CSTR antes de PFR
+        
         
         %Obtenção do máximo valor da função objetivo
         [Smax, I] = max(S);
@@ -249,7 +256,44 @@ for ordem = Ordem
         if Vtotal> Vmax || K(1)^2 > 1.025429326973434e+002
             S = inf;
         end
+        
+        
+        elseif Ordem(1)==-1 %PFR antes de CSTR
+            
+        
+           
+        %Calculando a vazao de entrada de TG em L/min
+        QTG0 = FTG0*872.6/924;
+        %Calculando uma vazão de entrada de Metanol de 6 mols pra 1 de TG em L/min:
+        QA0 = FTG0*6*32/791.8;
+        %Considerando o tempo de residência para esta reação
+        % de 60 minutos em batelada
+        Vmax = (QTG0+QA0)*60;
+               
+         %Obtenção do máximo valor da função objetivo
+        [Smax, I] = max(S);
+        Vpfr = V(I);  %Volume em que ocorre o máximo da função objetivo
+        S = -Smax;  %Inversão da função objetivo, para que seja _minimizada
+        
+        
+         Vtotal = V(1) + Vpfr;
+        
+         %Se ultrapassar o Vmax estipulado, explode função objetivo
+        if Vtotal > Vmax
+            S = inf;
+        end
+        
+        %Se ultrapassar o limite estipulado, explode função objetivo
+        if FA0 > 1.025429326973434e+002
+            S = inf;
+        end
+                
+        end
     end
+    
+    
+    
+    
     %-----------------------------------------Obj PFR
     
     if VetorDefinidor(4) && VetorDefinidor(3)==0
@@ -294,7 +338,7 @@ for ordem = Ordem
         end
         
     end
-end
+
 
 
 end
