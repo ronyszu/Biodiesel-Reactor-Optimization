@@ -21,7 +21,7 @@ FGL0 = 0;  %Não há alimentação de glicerol
 for ordem = Ordem
     
     switch ordem
-        %--------------------------------Separador
+        %--------------------------------Separador de 3 correntes
         case 10 %definir separador na Ordem depois
             if VetorDefinidor(1)
                 F = FBD0+FTG0+FDG0+FMG0+FGL0;
@@ -29,24 +29,60 @@ for ordem = Ordem
                 %composicoes da mistura inicial
                 Xbd= FBD0/F;
                 Xa= FA0/F;
-                Xtg= FTG0/F;    
+                Xtg= FTG0/F;
                 Xdg= FDG0/F;
                 Xmg= FMG0/F;
                 Xgli= FGL0/F;
                 
                 %divisao das correntes
                 %dois graus de liberdade a serem determinados:
-                x=0.333; %fracao que vai para corrente superior
-                y=0.333; %fracao que vai para corrente do meio
+                x=0.333333; %fracao que vai para corrente superior
+                y=0.333333; %fracao que vai para corrente do meio
                 
                 FS=x*F;
                 FM=y*F;
                 FI=F-FM-FS;
                 
-                FF= [FS,FM,FI,Xbd,Xa,Xtg,Xdg,Xmg,Xgli];
+                FBD0 = 0.333333*FBD0;  
+                FTG0 = 0.333333*FTG0;
+                FDG0 = 0.333333*FDG0; 
+                FMG0 = 0.333333*FMG0;  
+                FGL0 = 0.333333*FGL0;  
+                
+                FF3= [FBD0,FTG0,FMG0,FDG0,FGL0,Xbd,Xa,Xtg,Xdg,Xmg,Xgli];
+                %FF3= [FS,FM,FI,Xbd,Xa,Xtg,Xdg,Xmg,Xgli];
+            end
+             %--------------------------------Separador de 2 correntes
+        case 15 %definir separador na Ordem depois
+            if VetorDefinidor(1)
+                F = FBD0+FTG0+FDG0+FMG0+FGL0;
+                
+                %composicoes da mistura inicial
+                Xbd= FBD0/F;
+               % Xa= FA0/F;
+                Xtg= FTG0/F;
+                Xdg= FDG0/F;
+                Xmg= FMG0/F;
+                Xgli= FGL0/F;
+                
+                %divisao das correntes
+                %um grau de liberdade a ser determinado:
+                x=0.5; %fracao que vai para corrente superior
+                
+                FS=x*F;
+                FI=F-FS;
+                
+                FBD0 = 0.5*FBD0;  
+                FTG0 = 0.5*FTG0;
+                FDG0 = 0.5*FDG0; 
+                FMG0 = 0.5*FMG0;  
+                FGL0 = 0.5*FGL0; 
+                
+                FF2= [FBD0,FTG0,FMG0,FDG0,FGL0,Xbd,Xtg,Xdg,Xmg,Xgli];
+                %FF2= [FS,FI,Xbd,X,Xtg,Xdg,Xmg,Xgli];
             end
             
-            %--------------------------------Misturador
+            %--------------------------------Misturador de 3 correntes
         case 20 %definir misturador na Ordem depois
             
             if VetorDefinidor(2)
@@ -90,7 +126,42 @@ for ordem = Ordem
                 %Saida
                 FF=[F*Xbd,F*Xa,F*Xtg,F*Xdg,F*Xmg,F*Xgli];
             end
+               %--------------------------------Misturador de 2 correntes
+        case 25 %definir misturador na Ordem depois
             
+            if VetorDefinidor(2)
+                %Entrada
+                F1= FBD1+FA1+FTG1+FDG1+FMG1+FGL1;
+                F2= FBD2+FA2+FTG2+FDG2+FMG2+FGL2;
+                
+                %BMG
+                F = F1+F2;
+                
+                Xbd1= FBD1/F1;
+                Xa1= FA1/F1;
+                Xtg1= FTG1/F1;
+                Xdg1= FDG1/F1;
+                Xmg1= FMG1/F1;
+                Xgli1= FGL1/F1;
+                %--------------
+                Xbd2= FBD2/F2;
+                Xa2= FA2/F2;
+                Xtg2= FTG2/F2;
+                Xdg2= FDG2/F2;
+                Xmg2= FMG2/F2;
+                Xgli2= FGL2/F2;
+                
+                %BMCs
+                Xbd= (F1*Xbd1 + FI*Xbd2)/F;
+                Xa= (F1*Xa1  + FI*Xa2)/F;
+                Xtg= (F1*Xtg1 + FI*Xtg2)/F;
+                Xdg= (F1*Xdg1 + FI*Xdg2)/F;
+                Xmg= (F1*Xmg1 + FI*Xmg2)/F;
+                Xgli= (F1*Xgli1 + FI*Xgli2)/F;
+                
+                %Saida
+                FF=[F*Xbd,F*Xa,F*Xtg,F*Xdg,F*Xmg,F*Xgli];
+            end
             %--------------------------------CSTR
             
         case 1
@@ -146,6 +217,29 @@ for ordem = Ordem
                 end
                 
                 
+                if Ordem(1)==15 && Ordem(2)==1
+                    %Salva resultado para futuro
+                    FBD1 = FBD;
+                    FA1 = FA;
+                    FTG1 = FTG;
+                    FDG1 = FDG;
+                    FMG1 = FMG;
+                    FGL1 = FGL;
+                                   
+                    Ordem(2) = 99;
+                    
+                end
+                
+                if Ordem(1)==15 && Ordem(2) ~= 1  && Ordem(3)==1
+                    
+                    FBD2 = FBD;
+                    FA2 = FA;
+                    FTG2 = FTG;
+                    FDG2 = FDG;
+                    FMG2 = FMG;
+                    FGL2 = FGL;
+                    
+                end
                 
             end
             
@@ -156,7 +250,7 @@ for ordem = Ordem
             
             if VetorDefinidor(4)
                 
-                if VetorDefinidor(3)==0 % se só tiver PFR
+                if Ordem(1)==-1 % se só tiver PFR
                     FA0=K(1);  %se botar ao quadrado nao converge o PFR sozinho
                     
                 end
@@ -173,7 +267,7 @@ for ordem = Ordem
                 
                 
                 
-                if VetorDefinidor(3)==1
+                if Ordem(1)==1
                     FBD0=FBD;
                     FA0=FA;
                     FTG0=FTG;
@@ -196,7 +290,7 @@ for ordem = Ordem
                 % do reator CSTR operando em batelada
                 Vmaxpfr = Vmax/4;
                 
-                if VetorDefinidor(3)
+                if Ordem(1)==1
                     %Redefinindo o VmaxPFR a partir do volume já encontrado para o CSTR
                     Vmaxpfr = Vmaxpfr - V(1)/4;
                     %Redefine caso ultrapasse o limite inferior estipulado (0.1)
@@ -226,21 +320,30 @@ for ordem = Ordem
             end
             
     end
-    end
-    %---------------------------------------------------------Funcao Objetivo Final
+end
+%---------------------------------------------------------Funcao Objetivo Final
+
+%%Outras funções objetivo possíveis (conversão, seletividade, média...)
+%S = ( FBD./(FMG + FDG + FBD)).*(1-FTG./FTG0);
+%S = (( FBD./(FMG + FDG + FBD))+(1-FTG./FTG0))./2;
+%S = (1-FTG./FTG0);
+
+
+if Ordem(1)==15 || Ordem(1)==10
+
+   FBD=FF(1);
+   FMG=FF(3);
+   FDG=FF(4);
     
-    %%Outras funções objetivo possíveis (conversão, seletividade, média...)
-    %S = ( FBD./(FMG + FDG + FBD)).*(1-FTG./FTG0);
-    %S = (( FBD./(FMG + FDG + FBD))+(1-FTG./FTG0))./2;
-    %S = (1-FTG./FTG0);
-    %Cálculo da função objetivo
-    S = ( FBD./(FMG + FDG + FBD));
+end
+%Cálculo da função objetivo
+S = ( FBD./(FMG + FDG + FBD));
+
+
+%--------------------------------------Obj BOTH
+if (VetorDefinidor(3) && VetorDefinidor(4))
     
-    
-    %--------------------------------------Obj BOTH
-    if (VetorDefinidor(3) && VetorDefinidor(4))
-        
-        if Ordem(1)==1 %CSTR antes de PFR
+    if Ordem(1)==1 %CSTR antes de PFR
         
         
         %Obtenção do máximo valor da função objetivo
@@ -258,10 +361,10 @@ for ordem = Ordem
         end
         
         
-        elseif Ordem(1)==-1 %PFR antes de CSTR
-            
+    elseif Ordem(1)==-1 %PFR antes de CSTR
         
-            S = -S;  %Inversão da função objetivo, para que seja _minimizada_
+        
+        
         %Calculando a vazao de entrada de TG em L/min
         QTG0 = FTG0*872.6/924;
         %Calculando uma vazão de entrada de Metanol de 6 mols pra 1 de TG em L/min:
@@ -269,31 +372,6 @@ for ordem = Ordem
         %Considerando o tempo de residência para esta reação
         % de 60 minutos em batelada
         Vmax = (QTG0+QA0)*60;
-        %Se ultrapassar o Vmax estipulado, explode função objetivo
-        
-        Vtotal = V(1);
-            
-        if Vtotal > Vmax
-            S = inf;
-        end
-            
-            
-        
-            
-        
-        
-            
-            
-        
-        end
-    end
-    
-    
-    
-    
-    %-----------------------------------------Obj PFR
-    
-    if VetorDefinidor(4) && VetorDefinidor(3)==0
         
         %Obtenção do máximo valor da função objetivo
         [Smax, I] = max(S);
@@ -301,40 +379,68 @@ for ordem = Ordem
         S = -Smax;  %Inversão da função objetivo, para que seja _minimizada
         
         
-        %Se ultrapassar o limite estipulado, explode função objetivo
-        if FA0 > 1.025429326973434e+002
-            S = inf;
-        end
-    end
-    %-----------------------------------------Obj CSTR
-    
-    if VetorDefinidor(3) && VetorDefinidor(4)==0
-        S = -S;  %Inversão da função objetivo, para que seja _minimizada_
-        %Calculando a vazao de entrada de TG em L/min
-        QTG0 = FTG0*872.6/924;
-        %Calculando uma vazão de entrada de Metanol de 6 mols pra 1 de TG em L/min:
-        QA0 = FTG0*6*32/791.8;
-        %Considerando o tempo de residência para esta reação
-        % de 60 minutos em batelada
-        Vmax = (QTG0+QA0)*60;
+        Vtotal = V(1) + Vpfr;
+        
         %Se ultrapassar o Vmax estipulado, explode função objetivo
-        
-        Vtotal = V(1);
-        
-        if VetorDefinidor(3)==2
-            Vtotal = V(1)+V(2);
-        end
-        
-        if VetorDefinidor(3)==3
-            Vtotal = V(1)+V(2)+V(3);
-        end
-        
-        
         if Vtotal > Vmax
             S = inf;
         end
         
+        %Se ultrapassar o limite estipulado, explode função objetivo
+        if FA0 > 1.025429326973434e+002
+            S = inf;
+        end
+        
     end
+end
+
+
+
+
+%-----------------------------------------Obj PFR
+
+if VetorDefinidor(4) && VetorDefinidor(3)==0
+    
+    %Obtenção do máximo valor da função objetivo
+    [Smax, I] = max(S);
+    Vpfr = V(I);  %Volume em que ocorre o máximo da função objetivo
+    S = -Smax;  %Inversão da função objetivo, para que seja _minimizada
+    
+    
+    %Se ultrapassar o limite estipulado, explode função objetivo
+    if FA0 > 1.025429326973434e+002
+        S = inf;
+    end
+end
+%-----------------------------------------Obj CSTR
+
+if VetorDefinidor(3) && VetorDefinidor(4)==0
+    S = -S;  %Inversão da função objetivo, para que seja _minimizada_
+    %Calculando a vazao de entrada de TG em L/min
+    QTG0 = FTG0*872.6/924;
+    %Calculando uma vazão de entrada de Metanol de 6 mols pra 1 de TG em L/min:
+    QA0 = FTG0*6*32/791.8;
+    %Considerando o tempo de residência para esta reação
+    % de 60 minutos em batelada
+    Vmax = (QTG0+QA0)*60;
+    %Se ultrapassar o Vmax estipulado, explode função objetivo
+    
+    Vtotal = V(1);
+    
+    if VetorDefinidor(3)==2
+        Vtotal = V(1)+V(2);
+    end
+    
+    if VetorDefinidor(3)==3
+        Vtotal = V(1)+V(2)+V(3);
+    end
+    
+    
+    if Vtotal > Vmax
+        S = inf;
+    end
+    
+end
 
 
 

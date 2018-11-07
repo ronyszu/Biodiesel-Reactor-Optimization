@@ -34,8 +34,8 @@ global  Vpfr Vpfrboth VetorDefinidor Ordem
 % V2CSTR(2) = K(3)^2;  %Volume do 2o CSTR
 % FA02CSTR = K(1)^2;  %Vazão de entrada de Metanol
 % Obj2CSTR = -S;  %Valor da função objetivo
-
-
+% 
+% 
 % %Resolução p/ CSTR - PFR  - CONFIGURACAO 4
 % VetorDefinidor = [0 0 1 1]; %vai funcionar por enquanto, pois na rotina do otimizador, CSTR está antes do PFR, mas e depois para fazer ao contrário?
 % Ordem = [1 -1]; %define ordem, onde -1 é PFR, 1 é CSR , e misturador e separador?
@@ -44,16 +44,26 @@ global  Vpfr Vpfrboth VetorDefinidor Ordem
 % VBothPFR = Vpfrboth;  %Volume do PFR
 % FA0Both = K(1)^2;  %Vazão de entrada de Metanol
 % ObjBoth = -S;  %Valor da função objetivo
+% 
+% 
+% %Resolução p/ PFR - CSTR  - CONFIGURACAO 5
+% VetorDefinidor = [0 0 1 1]; 
+% Ordem = [-1 1]; %define ordem, onde -1 é PFR, 1 é CSTR , e misturador e separador?
+% [K, S] = fminsearch(@Otimizador_Central_BD, [8 1]);
+% VBothCSTR = K(2)^2;  %Volume do CSTR
+% VBothPFR = Vpfrboth;  %Volume do PFR
+% FA0Both = K(1)^2;  %Vazão de entrada de Metanol
+% ObjBoth = -S;  %Valor da função objetivo
 
+%Resolução p/ (CSTR) - (CSTR)  - CONFIGURACAO 6
+VetorDefinidor = [1 1 2 0]; %separador,misturador,cstr e pfr
+Ordem = [15 1 1 25]; %define ordem, onde -1 é PFR, 1 é CSR , 20 ou 25 misturador 10 ou 15 separador?
+[K, S] = fminsearch(@Otimizador_Central_BD, [8 1 1]);
+V2CSTR(1) = K(2)^2;  %Volume do 1o CSTR
+V2CSTR(2) = K(3)^2;  %Volume do 2o CSTR
+FA02CSTR = 2*K(1)^2;  %Vazão de entrada de Metanol
+Obj2CSTR = -S;  %Valor da função objetivo
 
-%Resolução p/ PFR - CSTR  - CONFIGURACAO 5
-VetorDefinidor = [0 0 1 1]; 
-Ordem = [-1 1]; %define ordem, onde -1 é PFR, 1 é CSR , e misturador e separador?
-[K, S] = fminsearch(@Otimizador_Central_BD, [8 1]);
-VBothCSTR = K(2)^2;  %Volume do CSTR
-VBothPFR = Vpfrboth;  %Volume do PFR
-FA0Both = K(1)^2;  %Vazão de entrada de Metanol
-ObjBoth = -S;  %Valor da função objetivo
 
 
 
